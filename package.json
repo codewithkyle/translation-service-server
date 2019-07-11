@@ -18,5 +18,8 @@
   "homepage": "https://github.com/codewithkyle/translation-service-server#readme",
   "devDependencies": {
     "typescript": "^3.5.3"
+  },
+  "dependencies": {
+    "express": "^4.17.1"
   }
 }
