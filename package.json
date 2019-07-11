@@ -7,8 +7,7 @@
     "compile": "tsc"
   },
   "repository": {
-    "type": "git",
-    "url": "git+ssh://git@github.com/codewithkyle/translation-service-server.git"
+    "url": "https://github.com/codewithkyle/translation-service-server"
   },
   "author": "Kyle Andrews",
   "license": "MIT",
