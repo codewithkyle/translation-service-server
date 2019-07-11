@@ -2,9 +2,9 @@
   "name": "translation-service-server",
   "version": "0.0.1",
   "description": "",
-  "main": "server.js",
+  "main": "Server.js",
   "scripts": {
-    "test": "test"
+    "compile": "tsc"
   },
   "repository": {
     "type": "git",
@@ -15,5 +15,8 @@
   "bugs": {
     "url": "https://github.com/codewithkyle/translation-service-server/issues"
   },
-  "homepage": "https://github.com/codewithkyle/translation-service-server#readme"
+  "homepage": "https://github.com/codewithkyle/translation-service-server#readme",
+  "devDependencies": {
+    "typescript": "^3.5.3"
+  }
 }
