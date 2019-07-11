@@ -1,0 +1,19 @@
+{
+  "name": "translation-service-server",
+  "version": "0.0.1",
+  "description": "",
+  "main": "server.js",
+  "scripts": {
+    "test": "test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/codewithkyle/translation-service-server.git"
+  },
+  "author": "Kyle Andrews",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/codewithkyle/translation-service-server/issues"
+  },
+  "homepage": "https://github.com/codewithkyle/translation-service-server#readme"
+}
