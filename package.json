@@ -4,7 +4,8 @@
   "description": "",
   "main": "Server.js",
   "scripts": {
-    "compile": "tsc"
+    "compile": "tsc",
+    "server": "node ./Server.js"
   },
   "repository": {
     "url": "https://github.com/codewithkyle/translation-service-server"
