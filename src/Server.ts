@@ -4,6 +4,7 @@ const express = require('express');
 const multer  = require('multer');
 const upload = multer({ dest: 'uploads/' });
 const fs = require('fs');
+const archiver = require('archiver');
 
 class Server
 {
@@ -60,6 +61,10 @@ class Server
                     const json = await this.getJsonFromFile(file);
                     const directoryPath:PathLike = await this.createTempDirectory(file.filename);
                     await this.createLocals(directoryPath, json);
+                    /** TODO: Generate PHP */
+                    /** TODO: Generate JSON */
+                    /** TODO: Zip Temporary Directory */
+                    /** TODO: Send Zip */
                     await resolve();
                 }
                 catch(err)
