@@ -36,12 +36,20 @@ class Server {
         })
             .catch(error => {
             return res.status(500).send(error);
+        })
+            .then(() => {
+            fs.unlink(req.file.path, (err) => {
+                if (err) {
+                    console.log('Failed to remove temp file', req.file.path, err);
+                }
+            });
         });
     }
     getJsonFromFile(file) {
         return new Promise((resolve, reject) => {
             switch (file.mimetype) {
                 case 'text/csv':
+                    reject('CSV parser is unfinished. Please use JSON.');
                     break;
                 case 'application/json':
                     fs.readFile(file.path, (err, file) => {

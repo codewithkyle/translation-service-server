@@ -50,6 +50,14 @@ class Server
         })
         .catch(error => {
             return res.status(500).send(error);
+        })
+        .then(()=>{
+            fs.unlink(req.file.path, (err:unknown)=>{
+                if(err)
+                {
+                    console.log('Failed to remove temp file', req.file.path, err);
+                }
+            });
         });
     }
 
@@ -60,6 +68,7 @@ class Server
             {
                 case 'text/csv':
                     /** TODO: Convert CSV to JSON */
+                    reject('CSV parser is unfinished. Please use JSON.');
                     break;
                 case 'application/json':
                     // @ts-ignore
