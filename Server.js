@@ -20,17 +20,7 @@ class Server {
         if (!req.file) {
             return res.status(400).send('No files were uploaded.');
         }
-        new Promise((resolve, reject) => {
-            (async () => {
-                try {
-                    const json = await this.getJsonFromFile(req.file);
-                    await resolve();
-                }
-                catch (err) {
-                    reject(err);
-                }
-            })();
-        })
+        this.parseFile(req.file)
             .then(() => {
             return res.status(200).send('Upload successful.');
         })
@@ -43,6 +33,19 @@ class Server {
                     console.log('Failed to remove temp file', req.file.path, err);
                 }
             });
+        });
+    }
+    parseFile(file) {
+        return new Promise((resolve, reject) => {
+            (async () => {
+                try {
+                    const json = await this.getJsonFromFile(file);
+                    await resolve();
+                }
+                catch (err) {
+                    reject(err);
+                }
+            })();
         });
     }
     getJsonFromFile(file) {

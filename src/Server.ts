@@ -33,10 +33,29 @@ class Server
             return res.status(400).send('No files were uploaded.');
         }
 
-        new Promise((resolve, reject)=>{
+        this.parseFile(req.file)
+        .then(()=>{
+            return res.status(200).send('Upload successful.');
+        })
+        .catch(error => {
+            return res.status(500).send(error);
+        })
+        .then(()=>{
+            fs.unlink(req.file.path, (err:string)=>{
+                if(err)
+                {
+                    console.log('Failed to remove temp file', req.file.path, err);
+                }
+            });
+        });
+    }
+
+    private parseFile(file:IFile) : Promise<unknown>
+    {
+        return new Promise((resolve, reject)=>{
             (async ()=>{
                 try{
-                    const json = await this.getJsonFromFile(req.file);
+                    const json = await this.getJsonFromFile(file);
                     await resolve();
                 }
                 catch(err)
@@ -45,20 +64,6 @@ class Server
                 }
             })();
         })
-        .then(()=>{
-            return res.status(200).send('Upload successful.');
-        })
-        .catch(error => {
-            return res.status(500).send(error);
-        })
-        .then(()=>{
-            fs.unlink(req.file.path, (err:unknown)=>{
-                if(err)
-                {
-                    console.log('Failed to remove temp file', req.file.path, err);
-                }
-            });
-        });
     }
 
     private getJsonFromFile(file:IFile) : Promise<any>
@@ -71,13 +76,11 @@ class Server
                     reject('CSV parser is unfinished. Please use JSON.');
                     break;
                 case 'application/json':
-                    // @ts-ignore
-                    fs.readFile(file.path, (err, file)=>{
+                    fs.readFile(file.path, (err:string, file:string)=>{
                         if(err)
                         {
                             reject('Failed to open JSON file.');
                         }
-
                         resolve(JSON.parse(file));
                     });
                     break;
