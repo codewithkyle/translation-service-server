@@ -1,3 +1,5 @@
+import { PathLike } from "fs";
+
 const express = require('express');
 const multer  = require('multer');
 const upload = multer({ dest: 'uploads/' });
@@ -56,7 +58,8 @@ class Server
             (async ()=>{
                 try{
                     const json = await this.getJsonFromFile(file);
-                    console.log(json);
+                    const directoryPath:PathLike = await this.createTempDirectory(file.filename);
+                    await this.createLocals(directoryPath, json);
                     await resolve();
                 }
                 catch(err)
@@ -65,6 +68,45 @@ class Server
                 }
             })();
         })
+    }
+
+    private createLocals(baseDirectoryPath:PathLike, json:any) : Promise<unknown>
+    {
+        return new Promise((resolve) => {
+            const keys = Object.keys(json);
+            const localsCreated = [];
+
+            for(let i = 0; i < keys.length; i++)
+            {
+                fs.mkdir(`${ baseDirectoryPath }/${ keys[i] }`, (err:string) => {
+                    if(err)
+                    {
+                        console.log(`Failed to create directory for ${ keys[i] }`);
+                    }
+
+                    localsCreated.push(keys[i]);
+
+                    if(keys.length === localsCreated.length)
+                    {
+                        resolve();
+                    }
+                });
+            }
+        });
+    }
+
+    private createTempDirectory(filename:string) : Promise<PathLike|string>
+    {
+        return new Promise((resolve, reject) => {
+            fs.mkdir(`temp/${ filename }`, (err:string) => {
+                if(err)
+                {
+                    reject('Failed to generate temp directory');
+                }
+
+                resolve(`temp/${ filename }`);
+            });
+        });
     }
 
     private getJsonFromFile(file:IFile) : Promise<any>

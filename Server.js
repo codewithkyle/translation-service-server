@@ -40,13 +40,41 @@ class Server {
             (async () => {
                 try {
                     const json = await this.getJsonFromFile(file);
-                    console.log(json);
+                    const directoryPath = await this.createTempDirectory(file.filename);
+                    await this.createLocals(directoryPath, json);
                     await resolve();
                 }
                 catch (err) {
                     reject(err);
                 }
             })();
+        });
+    }
+    createLocals(baseDirectoryPath, json) {
+        return new Promise((resolve) => {
+            const keys = Object.keys(json);
+            const localsCreated = [];
+            for (let i = 0; i < keys.length; i++) {
+                fs.mkdir(`${baseDirectoryPath}/${keys[i]}`, (err) => {
+                    if (err) {
+                        console.log(`Failed to create directory for ${keys[i]}`);
+                    }
+                    localsCreated.push(keys[i]);
+                    if (keys.length === localsCreated.length) {
+                        resolve();
+                    }
+                });
+            }
+        });
+    }
+    createTempDirectory(filename) {
+        return new Promise((resolve, reject) => {
+            fs.mkdir(`temp/${filename}`, (err) => {
+                if (err) {
+                    reject('Failed to generate temp directory');
+                }
+                resolve(`temp/${filename}`);
+            });
         });
     }
     getJsonFromFile(file) {
