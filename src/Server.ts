@@ -56,6 +56,7 @@ class Server
             (async ()=>{
                 try{
                     const json = await this.getJsonFromFile(file);
+                    console.log(json);
                     await resolve();
                 }
                 catch(err)
@@ -72,8 +73,9 @@ class Server
             switch(file.mimetype)
             {
                 case 'text/csv':
-                    /** TODO: Convert CSV to JSON */
-                    reject('CSV parser is unfinished. Please use JSON.');
+                    this.convertCSVtoJSON(file.path)
+                    .then(json => resolve(json))
+                    .catch(e => reject(e));
                     break;
                 case 'application/json':
                     fs.readFile(file.path, (err:string, file:string)=>{
@@ -88,6 +90,70 @@ class Server
                     reject('Invalid file type. Upload a CSV or JSON file.');
                     break;
             }
+        });
+    }
+
+    private convertCSVtoJSON(path:string) : Promise<unknown>
+    {
+        return new Promise((resolve, reject) => {
+            fs.readFile(path, (err:string, file:string) => {
+                if(err)
+                {
+                    reject('Failed to open CSV file.');
+                }
+
+                const json:any = {};
+                const csv = file.toString();
+                const rows = csv.split(/\n/g);
+                const locals = rows[0].split(/,(?!(?=[^"]*"[^"]*(?:"[^"]*"[^"]*)*$))/g);
+
+                for(let i = 0; i < locals.length; i++)
+                {
+                    let cleanName = locals[i].replace(/^[\"]/, '');
+                    cleanName = cleanName.replace(/[\"]$/, '');
+                    cleanName = cleanName.replace(/\"\"/g, `\${ '"' }`);
+                    locals[i] = cleanName;
+                    json[cleanName] = {};
+                }
+
+                if(rows)
+                {
+                    for(let i = 1; i < rows.length; i++)
+                    {
+                        const values = rows[i].split(/,(?!(?=[^"]*"[^"]*(?:"[^"]*"[^"]*)*$))/g);
+                        
+                        if(values)
+                        {
+                            if(values.length === locals.length)
+                            {
+                                for(let k = 0; k < locals.length; k++)
+                                {
+                                    let cleanName = values[k];
+                                    if(values[k].length)
+                                    {
+                                        cleanName = cleanName.replace(/^[\"]/, '');
+                                        cleanName = cleanName.replace(/[\"]$/, '');
+                                        cleanName = cleanName.replace(/\"\"/g, `\${ '"' }`);
+                                        values[k] = cleanName;
+                                    }
+                                    
+                                    json[locals[k]][values[0]] = cleanName;
+                                }
+                            }
+                        }
+                        else
+                        {
+                            reject('Failed to parse CSV values.');
+                        }
+                    }
+
+                    resolve(json);
+                }
+                else
+                {
+                    reject('Failed to parse CSV rows.');
+                }
+            });
         });
     }
 }
