@@ -1,4 +1,6 @@
 const express = require('express');
+const multer = require('multer');
+const upload = multer({ dest: 'uploads/' });
 class Server {
     constructor() {
         this._app = express();
@@ -7,7 +9,12 @@ class Server {
         this._app.get('/', (req, res) => {
             res.sendFile(`${__dirname}/public/index.html`);
         });
-        console.log('http://127.0.0.1:8181');
+        this._app.post('/upload', upload.single('translation'), (req, res) => {
+            if (!req.file) {
+                return res.status(400).send('No files were uploaded.');
+            }
+            return res.status(200).send('Upload successful.');
+        });
     }
 }
 new Server();
