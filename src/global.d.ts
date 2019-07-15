@@ -6,6 +6,7 @@ interface IServer{
 interface IExpress{
     get: (req:any, res:any)=>void;
     listen: (port:number)=>void;
+    use: Function;
 }
 
 interface IExpressRequest{
@@ -14,4 +15,5 @@ interface IExpressRequest{
 
 interface IExpressResponse{
     send: Function;
+    sendFile: Function;
 }

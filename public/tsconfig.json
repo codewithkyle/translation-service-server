@@ -1,14 +1,13 @@
 {
     "compilerOptions": {
-        "outDir": "./",
-        "sourceMap": false,
+        "target": "es5",
+        "module": "commonjs",
+        "outDir": "./assets",
+        "sourceMap": true,
         "noImplicitAny": true,
         "experimentalDecorators": true,
         "emitDecoratorMetadata": true,
-        "removeComments": true,
-        "target": "es2020",
-        "module": "esnext",
-        "moduleResolution": "node",
+        "rootDir": "./",
         "lib": [
             "dom",
             "scripthost",
@@ -20,10 +19,7 @@
         ]
     },
     "exclude": [
-        "./node_modules",
-        "./public"
-    ],
-    "include": [
+        "node_modules",
         "./src"
     ]
 }
