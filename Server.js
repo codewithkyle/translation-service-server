@@ -91,7 +91,8 @@ class Server {
                     try {
                         const path = `${directoryPath}/${locals[i]}`;
                         await fs.promises.access(path);
-                        await this.createPHP(path, json[locals[i]]);
+                        await this.createPhpFile(path, json[locals[i]]);
+                        await this.createJsonFile(path, json[locals[i]]);
                         await resolve();
                     }
                     catch (error) {
@@ -101,7 +102,33 @@ class Server {
             }
         });
     }
-    createPHP(directory, json) {
+    createJsonFile(directory, json) {
+        return new Promise((resolve, reject) => {
+            const translations = Object.entries(json);
+            let count = 0;
+            let file = '{\n';
+            for (const [key, value] of translations) {
+                count++;
+                const cleanKey = key.replace(/\\"/g, '"');
+                const cleanValue = value.replace(/\\"/g, '"');
+                file += `\t${JSON.stringify(cleanKey)}: ${JSON.stringify(cleanValue)}`;
+                if (count < translations.length) {
+                    file += ',\n';
+                }
+                else {
+                    file += '\n';
+                }
+            }
+            file += '}\n';
+            fs.writeFile(`${directory}/site.json`, file, (err) => {
+                if (err) {
+                    reject(`Failed to create ${directory}/site.json`);
+                }
+                resolve();
+            });
+        });
+    }
+    createPhpFile(directory, json) {
         return new Promise((resolve, reject) => {
             const translations = Object.entries(json);
             let count = 0;
@@ -137,6 +164,7 @@ class Server {
                 if (err) {
                     reject(`Failed to create ${directory}/site.php`);
                 }
+                resolve();
             });
         });
     }
