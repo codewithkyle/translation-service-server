@@ -2,6 +2,7 @@ const express = require('express');
 const multer = require('multer');
 const upload = multer({ dest: 'uploads/' });
 const fs = require('fs');
+const archiver = require('archiver');
 class Server {
     constructor() {
         this._app = express();
@@ -12,20 +13,32 @@ class Server {
     router() {
         this._app.get('/', this.homepage.bind(this));
         this._app.post('/upload', upload.single('translation'), this.upload.bind(this));
+        this._app.post('/convert', this.convert.bind(this));
     }
     homepage(req, res) {
-        return res.status(200).sendFile(`${__dirname}/public/index.html`);
+        res.status(200);
+        res.sendFile(`${__dirname}/public/index.html`);
+        return res;
+    }
+    convert(req, res) {
+        res.status(200);
+        return res;
     }
     upload(req, res) {
         if (!req.file) {
             return res.status(400).send('No files were uploaded.');
         }
         this.parseFile(req.file)
-            .then(() => {
-            return res.status(200).send('Upload successful.');
+            .then(json => {
+            res.status(200);
+            res.setHeader('Content-Type', 'application/json');
+            res.send(JSON.stringify(json));
+            return res;
         })
             .catch(error => {
-            return res.status(500).send(error);
+            res.status(500);
+            res.send(error);
+            return res;
         })
             .then(() => {
             fs.unlink(req.file.path, (err) => {
@@ -40,9 +53,7 @@ class Server {
             (async () => {
                 try {
                     const json = await this.getJsonFromFile(file);
-                    const directoryPath = await this.createTempDirectory(file.filename);
-                    await this.createLocals(directoryPath, json);
-                    await resolve();
+                    await resolve(json);
                 }
                 catch (err) {
                     reject(err);

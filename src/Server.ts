@@ -22,11 +22,20 @@ class Server
     {
         this._app.get('/', this.homepage.bind(this));
         this._app.post('/upload', upload.single('translation'), this.upload.bind(this));
+        this._app.post('/convert', this.convert.bind(this));
     }
 
     private homepage(req:IExpressRequest, res:IExpressResponse) : IExpressResponse
     {
-        return res.status(200).sendFile(`${ __dirname }/public/index.html`);
+        res.status(200);
+        res.sendFile(`${ __dirname }/public/index.html`);
+        return res;
+    }
+
+    private convert(req:IExpressRequest, res:IExpressResponse) : IExpressResponse
+    {
+        res.status(200);
+        return res;
     }
 
     private upload(req:IExpressRequest, res:IExpressResponse) : IExpressResponse
@@ -37,11 +46,16 @@ class Server
         }
 
         this.parseFile(req.file)
-        .then(()=>{
-            return res.status(200).send('Upload successful.');
+        .then(json =>{
+            res.status(200);
+            res.setHeader('Content-Type', 'application/json');
+            res.send(JSON.stringify(json));
+            return res;
         })
         .catch(error => {
-            return res.status(500).send(error);
+            res.status(500);
+            res.send(error);
+            return res;
         })
         .then(()=>{
             fs.unlink(req.file.path, (err:string)=>{
@@ -59,13 +73,13 @@ class Server
             (async ()=>{
                 try{
                     const json = await this.getJsonFromFile(file);
-                    const directoryPath:PathLike = await this.createTempDirectory(file.filename);
-                    await this.createLocals(directoryPath, json);
+                    // const directoryPath:PathLike = await this.createTempDirectory(file.filename);
+                    // await this.createLocals(directoryPath, json);
                     /** TODO: Generate PHP */
                     /** TODO: Generate JSON */
                     /** TODO: Zip Temporary Directory */
                     /** TODO: Send Zip */
-                    await resolve();
+                    await resolve(json);
                 }
                 catch(err)
                 {

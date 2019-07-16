@@ -15,9 +15,10 @@ interface IExpressRequest{
 }
 
 interface IExpressResponse{
-    send: Function;
-    sendFile: Function;
+    send: (value:string)=>void;
+    sendFile: (file:string)=>void;
     status: (status:number)=>any;
+    setHeader: (key:string, value:string)=>void;
 }
 
 interface IFile{
