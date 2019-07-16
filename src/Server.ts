@@ -6,6 +6,7 @@ const upload = multer({ dest: 'uploads/' });
 const fs = require('fs');
 const archiver = require('archiver');
 const bodyParser = require('body-parser');
+const uuid = require('uuid/v4');
 
 class Server
 {
@@ -94,8 +95,8 @@ class Server
         return new Promise((resolve, reject)=>{
             (async ()=>{
                 try{
-                    const uuid = 'test';
-                    const directoryPath:PathLike = await this.createTempDirectory(uuid);
+                    const id = uuid();
+                    const directoryPath:PathLike = await this.createTempDirectory(id);
                     await this.createLocals(directoryPath, json);
                     /** TODO: Generate PHP files */
                     /** TODO: Generate JSON files */
