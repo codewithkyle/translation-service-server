@@ -170,15 +170,24 @@ class Server {
     }
     parseFile(file) {
         return new Promise((resolve, reject) => {
-            (async () => {
-                try {
-                    const json = await this.getJsonFromFile(file);
-                    await resolve(json);
-                }
-                catch (err) {
-                    reject(err);
-                }
-            })();
+            switch (file.mimetype) {
+                case 'text/csv':
+                    this.convertCSVtoJSON(file.path)
+                        .then(json => resolve(json))
+                        .catch(e => reject(e));
+                    break;
+                case 'application/json':
+                    fs.readFile(file.path, (err, file) => {
+                        if (err) {
+                            reject('Failed to open JSON file.');
+                        }
+                        resolve(JSON.parse(file));
+                    });
+                    break;
+                default:
+                    reject('Invalid file type. Upload a CSV or JSON file.');
+                    break;
+            }
         });
     }
     createLocals(baseDirectoryPath, json) {
@@ -206,28 +215,6 @@ class Server {
                 }
                 resolve(`temp/${filename}`);
             });
-        });
-    }
-    getJsonFromFile(file) {
-        return new Promise((resolve, reject) => {
-            switch (file.mimetype) {
-                case 'text/csv':
-                    this.convertCSVtoJSON(file.path)
-                        .then(json => resolve(json))
-                        .catch(e => reject(e));
-                    break;
-                case 'application/json':
-                    fs.readFile(file.path, (err, file) => {
-                        if (err) {
-                            reject('Failed to open JSON file.');
-                        }
-                        resolve(JSON.parse(file));
-                    });
-                    break;
-                default:
-                    reject('Invalid file type. Upload a CSV or JSON file.');
-                    break;
-            }
         });
     }
     convertCSVtoJSON(path) {

@@ -241,16 +241,26 @@ class Server
     private parseFile(file:IFile) : Promise<unknown>
     {
         return new Promise((resolve, reject)=>{
-            (async ()=>{
-                try{
-                    const json = await this.getJsonFromFile(file);
-                    await resolve(json);
-                }
-                catch(err)
-                {
-                    reject(err);
-                }
-            })();
+            switch(file.mimetype)
+            {
+                case 'text/csv':
+                    this.convertCSVtoJSON(file.path)
+                    .then(json => resolve(json))
+                    .catch(e => reject(e));
+                    break;
+                case 'application/json':
+                    fs.readFile(file.path, (err:string, file:string)=>{
+                        if(err)
+                        {
+                            reject('Failed to open JSON file.');
+                        }
+                        resolve(JSON.parse(file));
+                    });
+                    break;
+                default:
+                    reject('Invalid file type. Upload a CSV or JSON file.');
+                    break;
+            }
         });
     }
 
@@ -290,32 +300,6 @@ class Server
 
                 resolve(`temp/${ filename }`);
             });
-        });
-    }
-
-    private getJsonFromFile(file:IFile) : Promise<any>
-    {
-        return new Promise((resolve, reject)=>{
-            switch(file.mimetype)
-            {
-                case 'text/csv':
-                    this.convertCSVtoJSON(file.path)
-                    .then(json => resolve(json))
-                    .catch(e => reject(e));
-                    break;
-                case 'application/json':
-                    fs.readFile(file.path, (err:string, file:string)=>{
-                        if(err)
-                        {
-                            reject('Failed to open JSON file.');
-                        }
-                        resolve(JSON.parse(file));
-                    });
-                    break;
-                default:
-                    reject('Invalid file type. Upload a CSV or JSON file.');
-                    break;
-            }
         });
     }
 
