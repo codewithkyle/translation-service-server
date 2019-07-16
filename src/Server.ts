@@ -5,6 +5,7 @@ const multer  = require('multer');
 const upload = multer({ dest: 'uploads/' });
 const fs = require('fs');
 const archiver = require('archiver');
+const bodyParser = require('body-parser');
 
 class Server
 {
@@ -34,6 +35,20 @@ class Server
 
     private convert(req:IExpressRequest, res:IExpressResponse) : IExpressResponse
     {
+        this.converter()
+        .then(()=>{
+            res.status(200);
+            return res;
+        })
+        .catch(error => {
+            res.status(500);
+            res.send(error);
+            return res;
+        })
+        .then(()=>{
+            /** TODO: Remove temp zip file */
+        });
+        
         res.status(200);
         return res;
     }
@@ -67,6 +82,28 @@ class Server
         });
     }
 
+    private converter(json:any) : Promise<unknown>
+    {
+        return new Promise((resolve, reject)=>{
+            (async ()=>{
+                try{
+                    const uuid = 'test';
+                    const directoryPath:PathLike = await this.createTempDirectory(uuid);
+                    await this.createLocals(directoryPath, json);
+                    /** TODO: Generate PHP files */
+                    /** TODO: Generate JSON files */
+                    /** TODO: Zip Temporary Directory */
+                    /** TODO: Send Zip */
+                    await resolve(json);
+                }
+                catch(err)
+                {
+                    reject(err);
+                }
+            })();
+        });
+    }
+
     private parseFile(file:IFile) : Promise<unknown>
     {
         return new Promise((resolve, reject)=>{
@@ -86,7 +123,7 @@ class Server
                     reject(err);
                 }
             })();
-        })
+        });
     }
 
     private createLocals(baseDirectoryPath:PathLike, json:any) : Promise<unknown>
