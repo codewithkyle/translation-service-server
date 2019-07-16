@@ -151,24 +151,27 @@ class Server
 
                 file += '\t';
 
-                if(key.match(/\'/g))
+                const cleanKey = key.replace(/\\"/g, '"');
+                const cleanValue = value.replace(/\\"/g, '"');
+
+                if(cleanKey.match(/\'/g))
                 {
-                    file += `"${ key }"`;
+                    file += `"${ cleanKey }"`;
                 }
                 else
                 {
-                    file += `'${ key }'`;
+                    file += `'${ cleanKey }'`;
                 }
 
                 file += ' => ';
 
-                if(value.match(/\'/g))
+                if(cleanValue.match(/\'/g))
                 {
-                    file += `"${ value }"`;
+                    file += `"${ cleanValue }"`;
                 }
                 else
                 {
-                    file += `'${ value }'`;
+                    file += `'${ cleanValue }'`;
                 }
 
                 if(count < translations.length)
@@ -198,12 +201,6 @@ class Server
             (async ()=>{
                 try{
                     const json = await this.getJsonFromFile(file);
-                    // const directoryPath:PathLike = await this.createTempDirectory(file.filename);
-                    // await this.createLocals(directoryPath, json);
-                    /** TODO: Generate PHP */
-                    /** TODO: Generate JSON */
-                    /** TODO: Zip Temporary Directory */
-                    /** TODO: Send Zip */
                     await resolve(json);
                 }
                 catch(err)
@@ -297,7 +294,7 @@ class Server
                 {
                     let cleanName = locals[i].replace(/^[\"]/, '');
                     cleanName = cleanName.replace(/[\"]$/, '');
-                    cleanName = cleanName.replace(/\"\"/g, `\${ '"' }`);
+                    cleanName = cleanName.replace(/\"\"/g, '\\"');
                     locals[i] = cleanName;
                     json[cleanName] = {};
                 }
@@ -319,7 +316,7 @@ class Server
                                     {
                                         cleanName = cleanName.replace(/^[\"]/, '');
                                         cleanName = cleanName.replace(/[\"]$/, '');
-                                        cleanName = cleanName.replace(/\"\"/g, `\${ '"' }`);
+                                        cleanName = cleanName.replace(/\"\"/g, '\\"');
                                         values[k] = cleanName;
                                     }
                                     

@@ -110,18 +110,20 @@ class Server {
             for (const [key, value] of translations) {
                 count++;
                 file += '\t';
-                if (key.match(/\'/g)) {
-                    file += `"${key}"`;
+                const cleanKey = key.replace(/\\"/g, '"');
+                const cleanValue = value.replace(/\\"/g, '"');
+                if (cleanKey.match(/\'/g)) {
+                    file += `"${cleanKey}"`;
                 }
                 else {
-                    file += `'${key}'`;
+                    file += `'${cleanKey}'`;
                 }
                 file += ' => ';
-                if (value.match(/\'/g)) {
-                    file += `"${value}"`;
+                if (cleanValue.match(/\'/g)) {
+                    file += `"${cleanValue}"`;
                 }
                 else {
-                    file += `'${value}'`;
+                    file += `'${cleanValue}'`;
                 }
                 if (count < translations.length) {
                     file += ',\n';
@@ -213,7 +215,7 @@ class Server {
                 for (let i = 0; i < locals.length; i++) {
                     let cleanName = locals[i].replace(/^[\"]/, '');
                     cleanName = cleanName.replace(/[\"]$/, '');
-                    cleanName = cleanName.replace(/\"\"/g, `\${ '"' }`);
+                    cleanName = cleanName.replace(/\"\"/g, '\\"');
                     locals[i] = cleanName;
                     json[cleanName] = {};
                 }
@@ -227,7 +229,7 @@ class Server {
                                     if (values[k].length) {
                                         cleanName = cleanName.replace(/^[\"]/, '');
                                         cleanName = cleanName.replace(/[\"]$/, '');
-                                        cleanName = cleanName.replace(/\"\"/g, `\${ '"' }`);
+                                        cleanName = cleanName.replace(/\"\"/g, '\\"');
                                         values[k] = cleanName;
                                     }
                                     json[locals[k]][values[0]] = cleanName;
