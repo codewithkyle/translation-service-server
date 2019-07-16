@@ -9,13 +9,12 @@ class Server {
         this._app = express();
         this._app.listen(8181);
         this._app.use(express.static('public'));
-        this._app.use(bodyParser.json());
         this.router();
     }
     router() {
         this._app.get('/', this.homepage.bind(this));
         this._app.post('/upload', upload.single('translation'), this.upload.bind(this));
-        this._app.post('/convert', this.convert.bind(this));
+        this._app.post('/convert', bodyParser.json(), this.convert.bind(this));
     }
     homepage(req, res) {
         res.status(200);
@@ -23,12 +22,12 @@ class Server {
         return res;
     }
     convert(req, res) {
-        if (!req.body || !req.body.translations || req.body.translations === '') {
+        if (!req.body) {
             res.status(400);
             res.send('Missing translations form data');
             return res;
         }
-        this.converter(req.body.translations)
+        this.converter(req.body)
             .then(() => {
             res.status(200);
             return res;
@@ -67,12 +66,11 @@ class Server {
             });
         });
     }
-    converter(translations) {
+    converter(json) {
         return new Promise((resolve, reject) => {
             (async () => {
                 try {
                     const uuid = 'test';
-                    const json = JSON.parse(translations);
                     const directoryPath = await this.createTempDirectory(uuid);
                     await this.createLocals(directoryPath, json);
                     await resolve(json);

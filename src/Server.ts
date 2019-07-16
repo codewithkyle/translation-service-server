@@ -16,7 +16,6 @@ class Server
         this._app = express();
         this._app.listen(8181);
         this._app.use(express.static('public'));
-        this._app.use(bodyParser.json());
         this.router();
     }
 
@@ -24,7 +23,7 @@ class Server
     {
         this._app.get('/', this.homepage.bind(this));
         this._app.post('/upload', upload.single('translation'), this.upload.bind(this));
-        this._app.post('/convert', this.convert.bind(this));
+        this._app.post('/convert', bodyParser.json(),this.convert.bind(this));
     }
 
     private homepage(req:IExpressRequest, res:IExpressResponse) : IExpressResponse
@@ -36,14 +35,14 @@ class Server
 
     private convert(req:IExpressRequest, res:IExpressResponse) : IExpressResponse
     {
-        if(!req.body || !req.body.translations || req.body.translations === '')
+        if(!req.body)
         {
             res.status(400);
             res.send('Missing translations form data');
             return res;
         }
 
-        this.converter(req.body.translations)
+        this.converter(req.body)
         .then(()=>{
             res.status(200);
             return res;
@@ -90,13 +89,12 @@ class Server
         });
     }
 
-    private converter(translations:string) : Promise<unknown>
+    private converter(json:any) : Promise<unknown>
     {
         return new Promise((resolve, reject)=>{
             (async ()=>{
                 try{
                     const uuid = 'test';
-                    const json = JSON.parse(translations);
                     const directoryPath:PathLike = await this.createTempDirectory(uuid);
                     await this.createLocals(directoryPath, json);
                     /** TODO: Generate PHP files */
