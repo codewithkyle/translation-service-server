@@ -3,11 +3,13 @@ const multer = require('multer');
 const upload = multer({ dest: 'uploads/' });
 const fs = require('fs');
 const archiver = require('archiver');
+const bodyParser = require('body-parser');
 class Server {
     constructor() {
         this._app = express();
         this._app.listen(8181);
         this._app.use(express.static('public'));
+        this._app.use(bodyParser.json());
         this.router();
     }
     router() {
@@ -21,6 +23,23 @@ class Server {
         return res;
     }
     convert(req, res) {
+        if (!req.body || !req.body.translations || req.body.translations === '') {
+            res.status(400);
+            res.send('Missing translations form data');
+            return res;
+        }
+        this.converter(req.body.translations)
+            .then(() => {
+            res.status(200);
+            return res;
+        })
+            .catch(error => {
+            res.status(500);
+            res.send(error);
+            return res;
+        })
+            .then(() => {
+        });
         res.status(200);
         return res;
     }
@@ -46,6 +65,22 @@ class Server {
                     console.log('Failed to remove temp file', req.file.path, err);
                 }
             });
+        });
+    }
+    converter(translations) {
+        return new Promise((resolve, reject) => {
+            (async () => {
+                try {
+                    const uuid = 'test';
+                    const json = JSON.parse(translations);
+                    const directoryPath = await this.createTempDirectory(uuid);
+                    await this.createLocals(directoryPath, json);
+                    await resolve(json);
+                }
+                catch (err) {
+                    reject(err);
+                }
+            })();
         });
     }
     parseFile(file) {

@@ -12,6 +12,7 @@ interface IExpress{
 
 interface IExpressRequest{
     file: IFile;
+    body: { translations:string };
 }
 
 interface IExpressResponse{
