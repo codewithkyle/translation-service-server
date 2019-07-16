@@ -98,8 +98,7 @@ class Server
                     const id = uuid();
                     const directoryPath:PathLike = await this.createTempDirectory(id);
                     await this.createLocals(directoryPath, json);
-                    /** TODO: Generate PHP files */
-                    /** TODO: Generate JSON files */
+                    await this.generateFiles(directoryPath, json);
                     /** TODO: Zip Temporary Directory */
                     /** TODO: Send Zip */
                     await resolve(json);
@@ -109,6 +108,87 @@ class Server
                     reject(err);
                 }
             })();
+        });
+    }
+
+    private generateFiles(directoryPath:PathLike, json:any) : Promise<unknown>
+    {
+        return new Promise((resolve, reject)=>{
+            const locals = Object.keys(json);
+
+            for(let i = 0; i < locals.length; i++)
+            {
+                (async ()=>{
+                    try
+                    {
+                        const path = `${ directoryPath }/${ locals[i] }`;
+                        await fs.promises.access(path);
+                        await this.createPHP(path, json[locals[i]]);
+                        await resolve();
+                    }
+                    catch(error)
+                    {
+                        reject(error);
+                    }
+                })();
+            }
+        });
+    }
+
+    private createPHP(directory:PathLike, json:object) : Promise<unknown>
+    {
+        return new Promise((resolve, reject)=>{
+            
+            const translations = Object.entries(json);
+            let count = 0;
+            
+            let file = '<?php\n\n';
+            file += 'return [\n';
+
+            for(const [key, value] of translations)
+            {
+                count++;
+
+                file += '\t';
+
+                if(key.match(/\'/g))
+                {
+                    file += `"${ key }"`;
+                }
+                else
+                {
+                    file += `'${ key }'`;
+                }
+
+                file += ' => ';
+
+                if(value.match(/\'/g))
+                {
+                    file += `"${ value }"`;
+                }
+                else
+                {
+                    file += `'${ value }'`;
+                }
+
+                if(count < translations.length)
+                {
+                    file += ',\n';
+                }
+                else
+                {
+                    file += '\n';
+                }
+            }
+
+            file += '];\n';
+
+            fs.writeFile(`${ directory }/site.php`, file, (err:string) => {
+                if(err)
+                {
+                    reject(`Failed to create ${ directory }/site.php`);
+                }
+            });
         });
     }
 

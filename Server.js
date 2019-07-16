@@ -74,12 +74,68 @@ class Server {
                     const id = uuid();
                     const directoryPath = await this.createTempDirectory(id);
                     await this.createLocals(directoryPath, json);
+                    await this.generateFiles(directoryPath, json);
                     await resolve(json);
                 }
                 catch (err) {
                     reject(err);
                 }
             })();
+        });
+    }
+    generateFiles(directoryPath, json) {
+        return new Promise((resolve, reject) => {
+            const locals = Object.keys(json);
+            for (let i = 0; i < locals.length; i++) {
+                (async () => {
+                    try {
+                        const path = `${directoryPath}/${locals[i]}`;
+                        await fs.promises.access(path);
+                        await this.createPHP(path, json[locals[i]]);
+                        await resolve();
+                    }
+                    catch (error) {
+                        reject(error);
+                    }
+                })();
+            }
+        });
+    }
+    createPHP(directory, json) {
+        return new Promise((resolve, reject) => {
+            const translations = Object.entries(json);
+            let count = 0;
+            let file = '<?php\n\n';
+            file += 'return [\n';
+            for (const [key, value] of translations) {
+                count++;
+                file += '\t';
+                if (key.match(/\'/g)) {
+                    file += `"${key}"`;
+                }
+                else {
+                    file += `'${key}'`;
+                }
+                file += ' => ';
+                if (value.match(/\'/g)) {
+                    file += `"${value}"`;
+                }
+                else {
+                    file += `'${value}'`;
+                }
+                if (count < translations.length) {
+                    file += ',\n';
+                }
+                else {
+                    file += '\n';
+                }
+            }
+            file += '];\n';
+            fs.writeFile(`${directory}/site.php`, file, (err) => {
+                if (err) {
+                    reject(`Failed to create ${directory}/site.php`);
+                }
+            });
         });
     }
     parseFile(file) {
