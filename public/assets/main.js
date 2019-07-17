@@ -34,6 +34,7 @@ var UploadPrompt = /** @class */ (function () {
         this.view = document.body.querySelector('upload-prompt');
         this._fileInput = this.view.querySelector('input#fileInput');
         this._fileInputLabel = this.view.querySelector('label');
+        this._fileProcessingStatus = this.view.querySelector('status');
         this.init();
     }
     UploadPrompt.prototype.init = function () {
@@ -63,6 +64,8 @@ var UploadPrompt = /** @class */ (function () {
         this.uploadFile(this._fileInput.files[0]);
     };
     UploadPrompt.prototype.uploadFile = function (file) {
+        this._fileInputLabel.classList.add('is-uploading');
+        this._fileProcessingStatus.innerHTML = 'Uploading file';
         var data = new FormData();
         data.append('translation', file);
         fetch(window.location.origin + "/upload", {

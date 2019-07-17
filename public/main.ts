@@ -35,12 +35,14 @@ class UploadPrompt{
     public view : HTMLElement;
     private _fileInput : HTMLInputElement;
     private _fileInputLabel : HTMLElement;
+    private _fileProcessingStatus : HTMLElement;
 
     constructor()
     {
         this.view = document.body.querySelector('upload-prompt');
         this._fileInput = this.view.querySelector('input#fileInput');
         this._fileInputLabel = this.view.querySelector('label');
+        this._fileProcessingStatus = this.view.querySelector('status');
 
         this.init();
     }
@@ -93,6 +95,8 @@ class UploadPrompt{
 
     private uploadFile(file:File) : void
     {
+        this._fileInputLabel.classList.add('is-uploading');
+        this._fileProcessingStatus.innerHTML = 'Uploading file';
         const data = new FormData();
         data.append('translation', file);
 

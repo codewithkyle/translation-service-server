@@ -1,3 +1,6 @@
+$offset: 188;
+$duration: 1.4s;
+
 :root {
     --shadow: rgba(21,27,38, 0.07);
     --bg-color: #f6f8f9;
@@ -78,11 +81,27 @@ main{
                         }
                     }
 
-                    span{
+                    status{
                         visibility: visible;
                         opacity: 0.6;
                         transform: translateY(0);
                         transition: all 200ms 320ms ease;
+                    }
+                }
+            }
+
+            &.is-uploading{
+                drop-instructions{
+                    upload{
+                        &:before{
+                            display: none;
+                        }
+
+                        svg{
+                            &.-spinner{
+                                display: inline-block;
+                            }
+                        }
                     }
                 }
             }
@@ -143,7 +162,7 @@ main{
                 flex-flow: column wrap;
 
                 upload,
-                span{
+                status{
                     visibility: hidden;
                     opacity: 0;
                     transform: translateY(32px);
@@ -159,20 +178,53 @@ main{
                     display: inline-flex;
                     margin-bottom: 2rem;
                     color: var(--primary-hover);
-                    border: 3px solid var(--primary-hover);
                     transition: all 200ms 80ms ease;
+
+                    &::before{
+                        content: "";
+                        display: inline-block;
+                        border: 3px solid var(--primary-hover);
+                        width: 100%;
+                        height: 100%;
+                        position: absolute;
+                        top: 0;
+                        border-radius: 50%;
+                        left: 0;
+                    }
     
                     svg{
-                        width: 32px;
-                        height: 32px;
-                        opacity: 0;
-                        margin: auto;
                         transform: translateY(16px);
+                        opacity: 0;
                         transition: transform 200ms 100ms ease, opacity 200ms 100ms ease;
+
+                        &.-icon{
+                            width: 32px;
+                            height: 32px;
+                            margin: auto;
+                        }
+
+                        &.-spinner{
+                            width: 100%;
+                            height: 100%;
+                            animation: rotator $duration linear infinite;
+                            display: none;
+                            position: absolute;
+                            top: 0;
+                            left: 0;
+                                
+                            circle{
+                                stroke-dasharray: $offset;
+                                stroke-dashoffset: 0;
+                                transform-origin: center;
+                                animation: dash $duration ease-in-out infinite;
+                                stroke-width: 2.25px;
+                                stroke: var(--primary-hover);
+                            }
+                        }
                     }
                 }
 
-                span{
+                status{
                     line-height: 1.618;
                     display: block;
                     pointer-events: none;
@@ -193,5 +245,22 @@ main{
             padding: 0;
             margin: 0;
         }
+    }
+}
+
+@keyframes rotator {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(270deg); }
+}
+
+@keyframes dash {
+    0% { stroke-dashoffset: $offset; }
+    50% {
+        stroke-dashoffset: $offset/4;
+        transform:rotate(135deg);
+    }
+    100% {
+        stroke-dashoffset: $offset;
+        transform:rotate(450deg);
     }
 }
