@@ -5,6 +5,7 @@ const fs = require('fs');
 const archiver = require('archiver');
 const bodyParser = require('body-parser');
 const uuid = require('uuid/v4');
+const rimraf = require('rimraf');
 class Server {
     constructor() {
         this._app = express();
@@ -28,8 +29,10 @@ class Server {
             res.send('Missing translations form data');
             return res;
         }
+        let conversionPath = null;
         this.converter(req.body)
-            .then(directoryPath => {
+            .then((directoryPath) => {
+            conversionPath = directoryPath;
             fs.readFile(`${directoryPath}.zip`, (err, data) => {
                 if (err) {
                     res.status(500);
@@ -50,6 +53,20 @@ class Server {
             return res;
         })
             .then(() => {
+            if (fs.existsSync(conversionPath)) {
+                rimraf(conversionPath, (err) => {
+                    if (err) {
+                        console.log(err);
+                    }
+                });
+            }
+            if (fs.existsSync(`${conversionPath}.zip`)) {
+                fs.unlink(`${conversionPath}.zip`, (err) => {
+                    if (err) {
+                        console.log(err);
+                    }
+                });
+            }
         });
         res.status(200);
         return res;

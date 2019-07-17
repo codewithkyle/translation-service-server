@@ -7,6 +7,7 @@ const fs = require('fs');
 const archiver = require('archiver');
 const bodyParser = require('body-parser');
 const uuid = require('uuid/v4');
+const rimraf = require('rimraf');
 
 class Server
 {
@@ -43,8 +44,11 @@ class Server
             return res;
         }
 
+        let conversionPath:PathLike = null;
+
         this.converter(req.body)
-        .then(directoryPath =>{
+        .then((directoryPath:PathLike) =>{
+            conversionPath = directoryPath;
             fs.readFile(`${ directoryPath }.zip`, (err:string, data:any)=>{
                 if(err)
                 {
@@ -68,7 +72,25 @@ class Server
             return res;
         })
         .then(()=>{
-            /** TODO: Remove temp zip file */
+            if(fs.existsSync(conversionPath))
+            {
+                rimraf(conversionPath, (err:string)=>{
+                    if(err)
+                    {
+                        console.log(err);
+                    }
+                });
+            }
+
+            if(fs.existsSync(`${ conversionPath }.zip`))
+            {
+                fs.unlink(`${ conversionPath }.zip`, (err:string)=>{
+                    if(err)
+                    {
+                        console.log(err);
+                    }
+                });
+            }
         });
         
         res.status(200);
