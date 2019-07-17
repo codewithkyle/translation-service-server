@@ -48,20 +48,20 @@ main{
                 heading{
                     opacity: 0;
                     transform: translateY(-32px);
-                    transition: all 300ms 0ms ease;
+                    transition: all 200ms 0ms ease;
                 }
 
                 instructions{
                     opacity: 0;
                     transform: translateY(-32px);
-                    transition: all 300ms 80ms ease;
+                    transition: all 200ms 80ms ease;
                 }
 
                 button{
                     opacity: 0;
                     transform: translateY(-32px);
                     pointer-events: none;
-                    transition: all 300ms 160ms ease;
+                    transition: all 200ms 160ms ease;
                 }
 
                 drop-instructions{
@@ -69,12 +69,12 @@ main{
                         visibility: visible;
                         opacity: 1;
                         transform: translateY(0);
-                        transition: all 300ms 240ms ease;
+                        transition: all 200ms 240ms ease;
 
                         svg{
                             transform: translateY(0);
                             opacity: 1;
-                            transition: transform 300ms 280ms ease, opacity 300ms 280ms ease;
+                            transition: transform 200ms 280ms ease, opacity 200ms 280ms ease;
                         }
                     }
 
@@ -82,7 +82,7 @@ main{
                         visibility: visible;
                         opacity: 0.6;
                         transform: translateY(0);
-                        transition: all 300ms 320ms ease;
+                        transition: all 200ms 320ms ease;
                     }
                 }
             }
@@ -95,7 +95,7 @@ main{
                 opacity: 0.87;
                 display: block;
                 pointer-events: none;
-                transition: all 300ms 320ms ease;
+                transition: all 200ms 320ms ease;
             }
     
             instructions{
@@ -104,7 +104,7 @@ main{
                 display: block;
                 margin-bottom: 2rem;
                 pointer-events: none;
-                transition: all 300ms 240ms ease;
+                transition: all 200ms 240ms ease;
             }
     
             button{
@@ -119,7 +119,7 @@ main{
                 font-weight: 600;
                 background-color: var(--primary);
                 cursor: pointer;
-                transition: all 300ms 160ms ease, background-color 150ms ease;
+                transition: all 200ms 160ms ease, background-color 150ms ease;
 
                 &:hover{
                     background-color: var(--primary-hover);
@@ -160,7 +160,7 @@ main{
                     margin-bottom: 2rem;
                     color: var(--primary-hover);
                     border: 3px solid var(--primary-hover);
-                    transition: all 300ms 80ms ease;
+                    transition: all 200ms 80ms ease;
     
                     svg{
                         width: 32px;
@@ -168,7 +168,7 @@ main{
                         opacity: 0;
                         margin: auto;
                         transform: translateY(16px);
-                        transition: transform 300ms 100ms ease, opacity 300ms 100ms ease;
+                        transition: transform 200ms 100ms ease, opacity 200ms 100ms ease;
                     }
                 }
 
@@ -176,7 +176,7 @@ main{
                     line-height: 1.618;
                     display: block;
                     pointer-events: none;
-                    transition: all 300ms 0ms ease;
+                    transition: all 200ms 0ms ease;
                 }
             }
         }
