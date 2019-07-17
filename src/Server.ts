@@ -44,9 +44,23 @@ class Server
         }
 
         this.converter(req.body)
-        .then(()=>{
-            res.status(200);
-            return res;
+        .then(directoryPath =>{
+            fs.readFile(`${ directoryPath }.zip`, (err:string, data:any)=>{
+                if(err)
+                {
+                    res.status(500);
+                    res.send(err);
+                    return res;
+                }
+
+                res.status(200);
+                res.setHeader('Content-Type', 'application/zip');
+                res.setHeader('Content-Disposition', `attachment; filename=${ directoryPath }.zip`);
+                res.setHeader('Content-Length', data.length);
+                res.end(data, 'binary');
+                return res;
+
+            });
         })
         .catch(error => {
             res.status(500);
@@ -99,13 +113,38 @@ class Server
                     const directoryPath:PathLike = await this.createTempDirectory(id);
                     await this.createLocals(directoryPath, json);
                     await this.generateFiles(directoryPath, json);
-                    /** TODO: Zip Temporary Directory */
-                    /** TODO: Send Zip */
-                    await resolve(json);
+                    await this.zipFiles(directoryPath, id);
+                    await resolve(directoryPath);
                 }
                 catch(err)
                 {
                     reject(err);
+                }
+            })();
+        });
+    }
+
+    private zipFiles(path:PathLike, id:string) : Promise<unknown>
+    {
+        return new Promise((resolve, reject)=>{
+            (async ()=>{
+                try
+                {
+                    await fs.promises.access(path);
+                    const output = fs.createWriteStream(`temp/${ id }.zip`);
+                    const archive = archiver('zip', { zlib: { level: 9 } });
+
+                    output.on('close', ()=>{
+                        resolve();
+                    });
+
+                    archive.pipe(output);
+                    archive.directory(path, 'translations');
+                    archive.finalize();
+                }
+                catch(error)
+                {
+                    reject(error);
                 }
             })();
         });

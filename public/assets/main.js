@@ -41,9 +41,13 @@ convertButton.addEventListener('click', function (e) {
         method: 'POST',
         body: JSON.stringify(translations)
     })
-        .then(function (request) { return request.text(); })
-        .then(function (response) {
-        console.log(response);
+        .then(function (request) { return request.blob(); })
+        .then(function (blob) {
+        var url = window.URL.createObjectURL(blob);
+        var temp = document.createElement('a');
+        temp.setAttribute('download', "translations.zip");
+        temp.href = url;
+        temp.click();
     })
         .catch(function (error) {
         console.error(error);

@@ -18,6 +18,7 @@ interface IExpressRequest{
 interface IExpressResponse{
     send: (value:string)=>void;
     sendFile: (file:string)=>void;
+    end: (data:any, type:string)=>void;
     status: (status:number)=>any;
     setHeader: (key:string, value:string)=>void;
 }
