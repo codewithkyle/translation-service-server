@@ -1,35 +1,3 @@
-
-let translations:any = null; 
-
-const convertButton:HTMLButtonElement = document.body.querySelector('button');
-convertButton.addEventListener('click', (e:Event)=>{
-    if(!translations)
-    {
-        return;
-    }
-
-    fetch(`${ window.location.origin }/convert`, {
-        headers: new Headers({
-            'X-Requested-With': 'XMLHttpRequest',
-            'Content-Type': 'application/json'
-        }),
-        credentials: 'include',
-        method: 'POST',
-        body: JSON.stringify(translations)
-    })
-    .then(request => request.blob())
-    .then(blob => {
-        const url = window.URL.createObjectURL(blob);
-        const temp = document.createElement('a');
-        temp.setAttribute('download', `translations.zip`);
-        temp.href = url;
-        temp.click();
-    })
-    .catch(error => {
-        console.error(error);
-    });
-});
-
 class UploadPrompt{
 
     public view : HTMLElement;
@@ -65,7 +33,12 @@ class UploadPrompt{
     private drop(e:DragEvent) : void
     {
         e.preventDefault();
-        e.stopImmediatePropagation();        
+        e.stopImmediatePropagation();
+
+        if(this.view.classList.contains('is-uploading'))
+        {
+            return;
+        }
 
         if(e.dataTransfer.files.length)
         {
@@ -75,16 +48,21 @@ class UploadPrompt{
 
     private dragEnter() : void
     {
-        this._fileInputLabel.classList.add('is-prompting');
+        this.view.classList.add('is-prompting');
     }
 
     private dragLeave() : void
     {
-        this._fileInputLabel.classList.remove('is-prompting');
+        this.view.classList.remove('is-prompting');
     }
 
     private change() : void
     {
+        if(this.view.classList.contains('is-uploading'))
+        {
+            return;
+        }
+
         if(!this._fileInput.files.length)
         {
             return;
@@ -95,7 +73,7 @@ class UploadPrompt{
 
     private uploadFile(file:File) : void
     {
-        this._fileInputLabel.classList.add('is-uploading');
+        this.view.classList.add('is-uploading');
         this._fileProcessingStatus.innerHTML = 'Uploading file';
         const data = new FormData();
         data.append('translation', file);
@@ -113,8 +91,36 @@ class UploadPrompt{
         .then(response => {
             if(response)
             {
-                translations = response;
+                this._fileProcessingStatus.innerHTML = 'Processing file';
+                this.convert(response);
             }
+        })
+        .catch(error => {
+            console.error(error);
+            this.view.classList.remove('is-uploading');
+            this.view.classList.remove('is-prompting');
+            this._fileProcessingStatus.innerHTML = 'Drop your file to upload';
+        });
+    }
+
+    private convert(translations:unknown) : void
+    {
+        fetch(`${ window.location.origin }/convert`, {
+            headers: new Headers({
+                'X-Requested-With': 'XMLHttpRequest',
+                'Content-Type': 'application/json'
+            }),
+            credentials: 'include',
+            method: 'POST',
+            body: JSON.stringify(translations)
+        })
+        .then(request => request.blob())
+        .then(blob => {
+            const url = window.URL.createObjectURL(blob);
+            const temp = document.createElement('a');
+            temp.setAttribute('download', `translations.zip`);
+            temp.href = url;
+            temp.click();
         })
         .catch(error => {
             console.error(error);
@@ -123,3 +129,4 @@ class UploadPrompt{
 }
 
 new UploadPrompt();
+

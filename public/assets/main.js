@@ -1,30 +1,3 @@
-var translations = null;
-var convertButton = document.body.querySelector('button');
-convertButton.addEventListener('click', function (e) {
-    if (!translations) {
-        return;
-    }
-    fetch(window.location.origin + "/convert", {
-        headers: new Headers({
-            'X-Requested-With': 'XMLHttpRequest',
-            'Content-Type': 'application/json'
-        }),
-        credentials: 'include',
-        method: 'POST',
-        body: JSON.stringify(translations)
-    })
-        .then(function (request) { return request.blob(); })
-        .then(function (blob) {
-        var url = window.URL.createObjectURL(blob);
-        var temp = document.createElement('a');
-        temp.setAttribute('download', "translations.zip");
-        temp.href = url;
-        temp.click();
-    })
-        .catch(function (error) {
-        console.error(error);
-    });
-});
 var UploadPrompt = /** @class */ (function () {
     function UploadPrompt() {
         this.handleFileUpload = this.change.bind(this);
@@ -47,24 +20,31 @@ var UploadPrompt = /** @class */ (function () {
     UploadPrompt.prototype.drop = function (e) {
         e.preventDefault();
         e.stopImmediatePropagation();
+        if (this.view.classList.contains('is-uploading')) {
+            return;
+        }
         if (e.dataTransfer.files.length) {
             this.uploadFile(e.dataTransfer.files[0]);
         }
     };
     UploadPrompt.prototype.dragEnter = function () {
-        this._fileInputLabel.classList.add('is-prompting');
+        this.view.classList.add('is-prompting');
     };
     UploadPrompt.prototype.dragLeave = function () {
-        this._fileInputLabel.classList.remove('is-prompting');
+        this.view.classList.remove('is-prompting');
     };
     UploadPrompt.prototype.change = function () {
+        if (this.view.classList.contains('is-uploading')) {
+            return;
+        }
         if (!this._fileInput.files.length) {
             return;
         }
         this.uploadFile(this._fileInput.files[0]);
     };
     UploadPrompt.prototype.uploadFile = function (file) {
-        this._fileInputLabel.classList.add('is-uploading');
+        var _this = this;
+        this.view.classList.add('is-uploading');
         this._fileProcessingStatus.innerHTML = 'Uploading file';
         var data = new FormData();
         data.append('translation', file);
@@ -80,8 +60,34 @@ var UploadPrompt = /** @class */ (function () {
             .then(function (request) { return request.json(); })
             .then(function (response) {
             if (response) {
-                translations = response;
+                _this._fileProcessingStatus.innerHTML = 'Processing file';
+                _this.convert(response);
             }
+        })
+            .catch(function (error) {
+            console.error(error);
+            _this.view.classList.remove('is-uploading');
+            _this.view.classList.remove('is-prompting');
+            _this._fileProcessingStatus.innerHTML = 'Drop your file to upload';
+        });
+    };
+    UploadPrompt.prototype.convert = function (translations) {
+        fetch(window.location.origin + "/convert", {
+            headers: new Headers({
+                'X-Requested-With': 'XMLHttpRequest',
+                'Content-Type': 'application/json'
+            }),
+            credentials: 'include',
+            method: 'POST',
+            body: JSON.stringify(translations)
+        })
+            .then(function (request) { return request.blob(); })
+            .then(function (blob) {
+            var url = window.URL.createObjectURL(blob);
+            var temp = document.createElement('a');
+            temp.setAttribute('download', "translations.zip");
+            temp.href = url;
+            temp.click();
         })
             .catch(function (error) {
             console.error(error);
