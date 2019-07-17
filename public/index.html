@@ -41,13 +41,18 @@
     </style>
 
     <link href="assets/main.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=Montserrat:300,400,600,800&display=swap" rel="stylesheet">
 </head>
 <body>
     <main>
         <upload-prompt>
             <input type="file" id="fileInput">
             <label for="fileInput">
-                Upload File
+                <heading>No translation file</heading>
+                <description>
+                    Drag & drop to upload a JSON or CSV or create a new translation file.
+                </description>
+                <button>Create</button>
             </label>
         </upload-prompt>
         <button style="padding: 0 16px; border-radius: 2px; height: 36px; line-height: 36px; text-transform: uppercase; background-color: coral;">Convert</button>
