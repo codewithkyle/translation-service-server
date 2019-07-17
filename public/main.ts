@@ -35,7 +35,7 @@ class UploadPrompt{
         e.preventDefault();
         e.stopImmediatePropagation();
 
-        if(this.view.classList.contains('is-uploading'))
+        if(this.view.classList.contains('is-uploading') || this.view.classList.contains('has-file'))
         {
             return;
         }
@@ -58,7 +58,7 @@ class UploadPrompt{
 
     private change() : void
     {
-        if(this.view.classList.contains('is-uploading'))
+        if(this.view.classList.contains('is-uploading') || this.view.classList.contains('has-file'))
         {
             return;
         }
@@ -75,6 +75,7 @@ class UploadPrompt{
     {
         this.view.classList.add('is-uploading');
         this._fileProcessingStatus.innerHTML = 'Uploading file';
+        this._fileInputLabel.setAttribute('for', '');
         const data = new FormData();
         data.append('translation', file);
 
@@ -121,6 +122,10 @@ class UploadPrompt{
             temp.setAttribute('download', `translations.zip`);
             temp.href = url;
             temp.click();
+            this.view.append(temp);
+            this.view.classList.remove('is-uploading');
+            this.view.classList.add('has-file');
+            this._fileProcessingStatus.innerHTML = 'Click to download file';
         })
         .catch(error => {
             console.error(error);

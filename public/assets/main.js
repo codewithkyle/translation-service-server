@@ -20,7 +20,7 @@ var UploadPrompt = /** @class */ (function () {
     UploadPrompt.prototype.drop = function (e) {
         e.preventDefault();
         e.stopImmediatePropagation();
-        if (this.view.classList.contains('is-uploading')) {
+        if (this.view.classList.contains('is-uploading') || this.view.classList.contains('has-file')) {
             return;
         }
         if (e.dataTransfer.files.length) {
@@ -34,7 +34,7 @@ var UploadPrompt = /** @class */ (function () {
         this.view.classList.remove('is-prompting');
     };
     UploadPrompt.prototype.change = function () {
-        if (this.view.classList.contains('is-uploading')) {
+        if (this.view.classList.contains('is-uploading') || this.view.classList.contains('has-file')) {
             return;
         }
         if (!this._fileInput.files.length) {
@@ -46,6 +46,7 @@ var UploadPrompt = /** @class */ (function () {
         var _this = this;
         this.view.classList.add('is-uploading');
         this._fileProcessingStatus.innerHTML = 'Uploading file';
+        this._fileInputLabel.setAttribute('for', '');
         var data = new FormData();
         data.append('translation', file);
         fetch(window.location.origin + "/upload", {
@@ -72,6 +73,7 @@ var UploadPrompt = /** @class */ (function () {
         });
     };
     UploadPrompt.prototype.convert = function (translations) {
+        var _this = this;
         fetch(window.location.origin + "/convert", {
             headers: new Headers({
                 'X-Requested-With': 'XMLHttpRequest',
@@ -88,6 +90,10 @@ var UploadPrompt = /** @class */ (function () {
             temp.setAttribute('download', "translations.zip");
             temp.href = url;
             temp.click();
+            _this.view.append(temp);
+            _this.view.classList.remove('is-uploading');
+            _this.view.classList.add('has-file');
+            _this._fileProcessingStatus.innerHTML = 'Click to download file';
         })
             .catch(function (error) {
             console.error(error);
