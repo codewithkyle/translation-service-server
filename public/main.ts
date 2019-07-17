@@ -74,8 +74,10 @@ class UploadPrompt{
     private uploadFile(file:File) : void
     {
         this.view.classList.add('is-uploading');
+        this.view.classList.add('is-prompting');
         this._fileProcessingStatus.innerHTML = 'Uploading file';
         this._fileInputLabel.setAttribute('for', '');
+        
         const data = new FormData();
         data.append('translation', file);
 
