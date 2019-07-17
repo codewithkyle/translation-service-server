@@ -40,9 +40,46 @@ main{
             justify-content: center;
             align-items: center;
             flex-flow: column wrap;
-            padding: 64px;
+            padding: 16px 96px;
             cursor: pointer;
             user-select: none;
+
+            &.is-prompting{
+                heading{
+                    opacity: 0;
+                    transform: translateY(-32px);
+                    transition: all 75ms ease-in;
+                }
+
+                instructions{
+                    opacity: 0;
+                    transform: translateY(-32px);
+                    transition: all 75ms 30ms ease-in;
+                }
+
+                button{
+                    opacity: 0;
+                    transform: translateY(-32px);
+                    pointer-events: none;
+                    transition: all 75ms 60ms ease-in;
+                }
+
+                drop-instructions{
+                    upload{
+                        visibility: visible;
+                        opacity: 1;
+                        transform: translateY(0);
+                        transition: all 75ms 90ms ease-in;
+                    }
+
+                    span{
+                        visibility: visible;
+                        opacity: 0.6;
+                        transform: translateY(0);
+                        transition: all 75ms 120ms ease-in;
+                    }
+                }
+            }
 
             heading{
                 font-weight: 600;
@@ -51,17 +88,22 @@ main{
                 margin-bottom: 1rem;
                 opacity: 0.87;
                 display: block;
+                pointer-events: none;
+                transition: all 75ms 120ms ease-out;
             }
     
-            description{
+            instructions{
                 line-height: 1.618;
                 opacity: 0.6;
                 display: block;
                 margin-bottom: 2rem;
+                pointer-events: none;
+                transition: all 75ms 90ms ease-out;
             }
     
             button{
                 height: 36px;
+                width: 86px;
                 line-height: 36px;
                 padding: 0 16px;
                 border-radius: 2px;
@@ -71,8 +113,7 @@ main{
                 font-weight: 600;
                 background-color: var(--primary);
                 cursor: pointer;
-                transition: all 150ms ease;
-                margin: 0 8px;
+                transition: all 75ms 60ms ease-out, background-color 150ms ease;
 
                 &:hover{
                     background-color: var(--primary-hover);
@@ -80,6 +121,54 @@ main{
 
                 &:active{
                     background-color: var(--primary-active);
+                }
+            }
+
+            drop-instructions{
+                display: inline-flex;
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                justify-content: center;
+                align-items: center;
+                pointer-events: none;
+                flex-flow: column wrap;
+
+                upload,
+                span{
+                    visibility: hidden;
+                    opacity: 0;
+                    transform: translateY(32px);
+                }
+
+                upload{
+                    border-radius: 50%;
+                    background-color: var(--primary-hover);
+                    width: 96px;
+                    height: 96px;
+                    pointer-events: none;
+                    justify-content: center;
+                    align-items: center;
+                    display: inline-flex;
+                    margin-bottom: 2rem;
+                    color: #fff;
+                    transition: all 75ms 30ms ease-out;
+    
+                    svg{
+                        width: 32px;
+                        height: 32px;
+                        opacity: 0.87;
+                        margin: auto;
+                    }
+                }
+
+                span{
+                    line-height: 1.618;
+                    display: block;
+                    pointer-events: none;
+                    transition: all 75ms 0ms ease-out;
                 }
             }
         }

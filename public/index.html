@@ -46,13 +46,21 @@
 <body>
     <main>
         <upload-prompt>
-            <input type="file" id="fileInput">
+            <input type="file" id="fileInput" accept=".json,.csv">
             <label for="fileInput">
                 <heading>No translation file</heading>
-                <description>
-                    Drag & drop to upload a JSON or CSV or create a new translation file.
-                </description>
-                <button>Create</button>
+                <instructions>
+                    Drag & Drop to upload or create a new translation
+                </instructions>
+                <button>
+                    <span>Create</span>
+                </button>
+                <drop-instructions>
+                    <upload>
+                        <svg aria-hidden="true" focusable="false" data-prefix="far" data-icon="arrow-to-top" class="svg-inline--fa fa-arrow-to-top fa-w-12" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512"><path fill="currentColor" d="M35.5 279.9l148-148.4c4.7-4.7 12.3-4.7 17 0l148 148.4c4.7 4.7 4.7 12.3 0 17l-19.6 19.6c-4.8 4.8-12.5 4.7-17.1-.2L218 219.2V468c0 6.6-5.4 12-12 12h-28c-6.6 0-12-5.4-12-12V219.2l-93.7 97.1c-4.7 4.8-12.4 4.9-17.1.2l-19.6-19.6c-4.8-4.7-4.8-12.3-.1-17zM12 84h360c6.6 0 12-5.4 12-12V44c0-6.6-5.4-12-12-12H12C5.4 32 0 37.4 0 44v28c0 6.6 5.4 12 12 12z"></path></svg>
+                    </upload>
+                    <span>Drop your file to upload</span>
+                </drop-instructions>
             </label>
         </upload-prompt>
         <button style="padding: 0 16px; border-radius: 2px; height: 36px; line-height: 36px; text-transform: uppercase; background-color: coral;">Convert</button>
