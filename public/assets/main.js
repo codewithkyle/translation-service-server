@@ -48,7 +48,6 @@ var UploadPrompt = /** @class */ (function () {
         this.view.classList.add('is-prompting');
         this._fileProcessingStatus.innerHTML = 'Uploading file';
         this._fileInputLabel.setAttribute('for', '');
-        console.log('file');
         var data = new FormData();
         data.append('translation', file);
         fetch(window.location.origin + "/upload", {
