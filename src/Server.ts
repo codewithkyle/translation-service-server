@@ -16,7 +16,7 @@ class Server
     constructor()
     {
         this._app = express();
-        this._app.listen(80);
+        this._app.listen(8181);
         this._app.use(express.static('public'));
         this.router();
     }
